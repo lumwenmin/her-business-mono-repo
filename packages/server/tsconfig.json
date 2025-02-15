@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "dist", // Output directory for compiled files
+    "rootDir": "src" // The root folder of your TypeScript source files
+  },
+  "include": ["src"]
+}
