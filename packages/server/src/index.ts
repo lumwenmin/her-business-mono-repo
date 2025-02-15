@@ -1,18 +1,42 @@
+import fastify from "fastify";
 import * as dotenv from "dotenv";
 dotenv.config();
-const fastify = require("fastify")();
 
-fastify.register(require("@fastify/mysql"), {
+// Import your tRPC components
+import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
+import { createContext } from "./context";
+import { appRouter } from "./routers";
+
+// Create a single Fastify instance
+const server = fastify({
+  maxParamLength: 5000,
+});
+
+// Register the MySQL plugin
+server.register(require("@fastify/mysql"), {
   connectionString: process.env.DATABASE_URL,
 });
 
-fastify.listen({ port: 4000 }, (error: Error) => {
-  if (error) throw error;
-  console.log(`server listening on ${fastify.server.address().port}`);
+// Register a simple REST route (optional)
+server.get("/", async () => {
+  return { hello: "world" };
 });
 
-fastify.get("/", () => {
-  return {
-    hello: "world",
-  };
+// Register the tRPC plugin
+server.register(fastifyTRPCPlugin, {
+  prefix: "/trpc",
+  trpcOptions: {
+    router: appRouter,
+    createContext,
+    onError({ path, error }: { path?: string; error: Error }) {
+      const resolvedPath = path ?? "unknown";
+      console.error(`Error in tRPC handler on path '${resolvedPath}':`, error);
+    },
+  },
+});
+
+// Start the server
+server.listen({ port: 4000 }, (err: Error | null, address?: string) => {
+  if (err) throw err;
+  console.log(`Server listening on ${address}`);
 });

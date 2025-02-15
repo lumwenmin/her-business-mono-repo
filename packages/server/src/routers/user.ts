@@ -10,8 +10,20 @@ export const userRouter = t.router({
   }),
   // Example procedure to create a user
   createUser: t.procedure
-    .input(z.object({ name: z.string(), email: z.string().email() }))
+    .input(
+      z.object({
+        name: z.string().min(1, "Name is required"),
+        email: z.string().email("Must be a valid email"),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.user.create({ data: input });
+      // Use the Prisma client from the context to create a new user record
+      const newUser = await ctx.prisma.user.create({
+        data: {
+          name: input.name,
+          email: input.email,
+        },
+      });
+      return newUser;
     }),
 });
