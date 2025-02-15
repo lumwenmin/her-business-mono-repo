@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/cors": "^10.0.2",
     "@fastify/mysql": "^5.0.2",
     "@trpc/server": "^10.45.2",
     "dotenv": "^16.4.7",

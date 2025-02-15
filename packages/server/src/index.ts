@@ -1,4 +1,5 @@
 import fastify from "fastify";
+import cors from "@fastify/cors";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -10,6 +11,12 @@ import { appRouter } from "./routers";
 // Create a single Fastify instance
 const server = fastify({
   maxParamLength: 5000,
+});
+
+// Register the CORS plugin to handle preflight (OPTIONS) requests
+server.register(cors, {
+  origin: true, // Allow all origins; adjust as needed for your security requirements
+  methods: ["GET", "POST", "OPTIONS"], // Ensure OPTIONS is included
 });
 
 // Register the MySQL plugin
